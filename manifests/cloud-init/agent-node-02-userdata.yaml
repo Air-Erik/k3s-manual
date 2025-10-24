@@ -1,0 +1,36 @@
+#cloud-config
+# Cloud-init user data для k3s Agent ноды 2
+# Дата: 2025-10-24
+
+# Пользователь
+users:
+  - name: k3s-admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NN...5+Fi35iKr5qArSLJkj+rcK0Ej19EjA eric@REMOTE-VM
+
+# Настройки SSH
+ssh_pwauth: true
+chpasswd:
+  list: |
+    k3s-admin:admin
+  expire: false
+  encrypted: false
+
+# Минимальные команды для запуска
+runcmd:
+  # Создание директории для k3s
+  - mkdir -p /opt/k3s-setup
+  - chown k3s-admin:k3s-admin /opt/k3s-setup
+
+  # Настройка firewall для k3s
+  - ufw allow ssh
+  - ufw allow 10250/tcp comment 'kubelet'
+  - ufw allow 8472/udp comment 'Flannel VXLAN'
+  - ufw --force enable
+
+# Настройки пакетов
+package_update: false
+package_upgrade: false
+package_reboot_if_required: false

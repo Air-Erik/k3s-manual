@@ -1,0 +1,38 @@
+#cloud-config
+# Cloud-init metadata для k3s Agent ноды 1
+# Дата: 2025-10-24
+# IP: 10.246.10.51
+# Hostname: k3s-agent-01
+
+# Настройка хоста
+hostname: k3s-agent-01
+fqdn: k3s-agent-01
+manage_etc_hosts: true
+
+# Настройка сети
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    nic0:
+      match:
+        driver: vmxnet3
+      addresses:
+        - 10.246.10.51/24
+      routes:
+        - to: default
+          via: 10.246.10.1
+      nameservers:
+        addresses: [172.17.10.3, 8.8.8.8]
+
+# Настройки времени
+timezone: UTC
+ntp:
+  enabled: true
+  servers:
+    - 0.pool.ntp.org
+    - 1.pool.ntp.org
+    - 2.pool.ntp.org
+
+# Настройки локали
+locale: en_US.UTF-8
