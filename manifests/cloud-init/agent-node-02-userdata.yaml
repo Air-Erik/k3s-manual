@@ -24,6 +24,10 @@ runcmd:
   - mkdir -p /opt/k3s-setup
   - chown k3s-admin:k3s-admin /opt/k3s-setup
 
+  # Установка ufw если его нет
+  - apt update
+  - apt install -y ufw
+
   # Настройка firewall для k3s
   - ufw allow ssh
   - ufw allow 10250/tcp comment 'kubelet'
