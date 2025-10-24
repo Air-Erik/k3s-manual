@@ -215,10 +215,16 @@ log "Копирование kubeconfig..."
 sudo cp /etc/rancher/k3s/k3s.yaml $CREDS_DIR/kubeconfig.yaml
 sudo chown $(id -u):$(id -g) $CREDS_DIR/kubeconfig.yaml
 
+# Исправление прав на оригинальный kubeconfig
+log "Исправление прав на kubeconfig..."
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+sudo chown $(id -u):$(id -g) /etc/rancher/k3s/k3s.yaml
+
 # Создание kubeconfig для kubectl на текущей машине
 log "Настройка kubectl для текущего пользователя..."
 mkdir -p $HOME/.kube
-cp $CREDS_DIR/kubeconfig.yaml $HOME/.kube/config
+cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+chmod 600 $HOME/.kube/config
 
 # Проверка kubectl
 if kubectl get nodes >/dev/null 2>&1; then
