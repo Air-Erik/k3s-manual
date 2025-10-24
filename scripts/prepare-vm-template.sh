@@ -192,10 +192,17 @@ EOF
     sudo systemctl unmask cloud-init cloud-init-local cloud-config cloud-final
     sudo systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
+    # Включение cloud-init для VMware
+    sudo systemctl enable cloud-init
+    sudo systemctl start cloud-init
+
     # Базовая конфигурация cloud-init
     sudo tee /etc/cloud/cloud.cfg.d/99-k3s-template.cfg > /dev/null << 'EOF'
 # Cloud-init конфигурация для k3s Template
 # Дата: 2025-10-24
+
+# Включение cloud-init для VMware
+disable_vmware_customization: false
 
 # Отключение обновлений при первом запуске
 package_update: false
@@ -227,9 +234,8 @@ EOF
     sudo tee /etc/cloud/cloud.cfg.d/99-vmware.cfg > /dev/null << 'EOF'
 # VMware специфичные настройки cloud-init
 
-# Отключение cloud-init для сетевых интерфейсов (будет настроено через netplan)
-network:
-  config: disabled
+# Включение cloud-init для VMware
+disable_vmware_customization: false
 
 # Настройки для VMware Tools
 datasource:
@@ -237,7 +243,14 @@ datasource:
     metadata_urls: ['http://169.254.169.254']
     max_wait: 10
     timeout: 5
+
+# Настройки сети для VMware
+network:
+  config: enabled
 EOF
+
+    # Дополнительно: изменение основного cloud.cfg
+    sudo sed -i 's/disable_vmware_customization: true/disable_vmware_customization: false/' /etc/cloud/cloud.cfg || true
 
     success "Cloud-init настроен"
 }

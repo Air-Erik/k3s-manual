@@ -319,6 +319,22 @@ cat /etc/cloud/cloud.cfg.d/98-datasource.cfg
 
 # Удалить кастомные netplan-файлы, чтобы cloud-init сгенерировал 50-cloud-init.yaml
 sudo rm -f /etc/netplan/*.yaml
+
+# Проверка что cloud-init активен
+sudo systemctl status cloud-init
+# Должен быть: active (running)
+
+# Если cloud-init не активен:
+sudo systemctl enable cloud-init
+sudo systemctl start cloud-init
+
+# КРИТИЧЕСКИ ВАЖНО: Включение cloud-init для VMware
+# Добавление настройки в cloud.cfg
+echo "disable_vmware_customization: false" | sudo tee -a /etc/cloud/cloud.cfg
+
+# Проверка добавления
+grep "disable_vmware_customization" /etc/cloud/cloud.cfg
+# Должно быть: disable_vmware_customization: false
 ```
 
 ### Шаг 19: Подготовка к скрипту
